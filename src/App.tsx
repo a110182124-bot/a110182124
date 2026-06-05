@@ -23,7 +23,11 @@ import {
   X,
   Trash2,
   Paperclip,
-  Play
+  Play,
+  Film,
+  BookOpen,
+  Download,
+  FileText
 } from "lucide-react";
 
 // --- Types ---
@@ -121,6 +125,8 @@ export default function App() {
   const [activeTab, setActiveTab] = React.useState<"home" | "upload">("home");
   const [files, setFiles] = React.useState<{ name: string; size: string; date: string }[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
+  const [activeVideo, setActiveVideo] = React.useState<"youtube" | "local">("youtube");
+  const [activePdf, setActivePdf] = React.useState<"ascent" | "meals">("ascent");
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
     e.preventDefault();
@@ -424,54 +430,214 @@ export default function App() {
         ) : (
           /* Upload Page */
           <div className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
-            <SectionHeading icon={Upload} subtitle="AI ASSIGNMENTS">AI 連假影片</SectionHeading>
+            <SectionHeading icon={Upload} subtitle="AI ASSIGNMENTS">AI 作業展示</SectionHeading>
             
-            <div className="max-w-4xl mx-auto">
-              <div>
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="relative group rounded-3xl overflow-hidden border border-border bg-black aspect-video flex items-center justify-center"
-                >
-                  <video 
-                    controls 
-                    autoPlay
-                    muted
-                    loop
-                    className="w-full h-full object-cover"
-                  >
-                    <source src="ai_video.mp4" type="video/mp4" />
-                    您的瀏覽器不支援影片播放。
-                  </video>
-                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-4">
-                      <Play className="w-8 h-8 text-white fill-white" />
-                    </div>
-                    <p className="text-white text-sm font-medium">觀看 AI 生成影片</p>
-                  </div>
-                </motion.div>
-
-                <div className="mt-12 space-y-4">
-                  <h4 className="text-white font-mono text-xs uppercase tracking-widest border-b border-border pb-4 flex items-center justify-between">
-                    <span>3D 公仔展示</span>
-                    <span className="text-muted font-light">模型預覽</span>
-                  </h4>
-                  
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-6 rounded-2xl border border-border bg-white/5 break-all"
-                  >
-                    <p className="text-sm text-muted mb-2">3D 模型網址：</p>
-                    <a 
-                      href="https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-white hover:text-blue-400 transition-colors underline decoration-border underline-offset-4"
+            <div className="max-w-4xl mx-auto space-y-16">
+              {/* Video Section */}
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4">
+                  <h3 className="text-xl font-light text-white flex items-center gap-3">
+                    <Film className="w-5 h-5 text-muted" />
+                    <span>AI 成果影片區</span>
+                  </h3>
+                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0">
+                    <button 
+                      onClick={() => setActiveVideo("youtube")}
+                      className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${activeVideo === "youtube" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
                     >
-                      https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0
-                    </a>
+                      官方 YouTube
+                    </button>
+                    <button 
+                      onClick={() => setActiveVideo("local")}
+                      className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${activeVideo === "local" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                    >
+                      航海模擬 (本地)
+                    </button>
+                  </div>
+                </div>
+
+                <motion.div 
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="relative group rounded-3xl overflow-hidden border border-border bg-black aspect-video flex items-center justify-center shadow-2xl"
+                >
+                  {activeVideo === "youtube" ? (
+                    <iframe 
+                      src="https://www.youtube.com/embed/93ViSf3tazQ"
+                      title="AI 連假作業成果影片"
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video 
+                      controls 
+                      autoPlay
+                      muted
+                      loop
+                      className="w-full h-full object-cover"
+                    >
+                      <source src="ai_video.mp4" type="video/mp4" />
+                      您的瀏覽器不支援影片播放。
+                    </video>
+                  )}
+                </motion.div>
+                <p className="text-xs text-muted text-center italic">
+                  * 提示：可以使用上方選單切換播放 YouTube 實拍作品或本機航海模擬影像
+                </p>
+              </div>
+
+              {/* 3D Toy model Section */}
+              <div className="space-y-6">
+                <h3 className="text-xl font-light text-white flex items-center gap-3 border-b border-border pb-4">
+                  <Play className="w-5 h-5 text-muted" />
+                  <span>3D 公仔展示</span>
+                </h3>
+                
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-6 rounded-2xl border border-border bg-white/5 break-all"
+                >
+                  <p className="text-sm text-muted mb-2 font-light">外部 3D 模型實境網址：</p>
+                  <a 
+                    href="https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-white hover:text-blue-400 transition-colors underline decoration-border underline-offset-4 font-mono text-sm"
+                  >
+                    https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0
+                  </a>
+                </motion.div>
+              </div>
+
+              {/* Presentation Slide deck Section */}
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4">
+                  <h3 className="text-xl font-light text-white flex items-center gap-3">
+                    <BookOpen className="w-5 h-5 text-muted" />
+                    <span>作業簡報區 (AI 企劃與行程)</span>
+                  </h3>
+                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0">
+                    <button 
+                      onClick={() => setActivePdf("ascent")}
+                      className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${activePdf === "ascent" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                    >
+                      春季登山企劃
+                    </button>
+                    <button 
+                      onClick={() => setActivePdf("meals")}
+                      className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${activePdf === "meals" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                    >
+                      連假行程規劃
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="w-full aspect-[4/3] md:aspect-[16/10] rounded-3xl overflow-hidden border border-border bg-black/60 shadow-xl"
+                  >
+                    {activePdf === "ascent" ? (
+                      <iframe 
+                        src="./Tainan_to_Alishan_Spring_Ascent.pdf" 
+                        className="w-full h-full border-0 select-none bg-zinc-950"
+                        title="Tainan to Alishan Spring Ascent PDF View"
+                      />
+                    ) : (
+                      <iframe 
+                        src="./連假每日行程與餐點規劃.pdf" 
+                        className="w-full h-full border-0 select-none bg-zinc-950"
+                        title="Holiday Planning & Meals PDF View"
+                      />
+                    )}
                   </motion.div>
+
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h4 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-muted" />
+                      {activePdf === "ascent" ? "台南至阿里山春季攀登企劃" : "連假每日行程與餐點規劃"}
+                    </h4>
+                    <p className="text-sm text-muted leading-relaxed font-light">
+                      {activePdf === "ascent" 
+                        ? "本企劃詳細記錄了台南至阿里山的春季越野遠航與攀登企劃。藉由清明連假，規劃自海平面一路爬升至高山雲海的探索。完整文件包含地形氣象分析、小組安全防護與通訊計畫。"
+                        : "本行程表完整規劃了清明連假的每日活動軌跡與三餐預算。深入探究南台灣台南與嘉義的人文古蹟及特色美食，並進行均衡的預算分配。"}
+                    </p>
+                    <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                      <span className="text-xs text-muted font-mono uppercase">已發佈於 public 目錄</span>
+                      <a 
+                        href={activePdf === "ascent" ? "./Tainan_to_Alishan_Spring_Ascent.pdf" : "./連假每日行程與餐點規劃.pdf"} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="text-white text-xs hover:underline flex items-center gap-1 font-mono"
+                      >
+                        在新分頁開啟完整 PDF <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Downloadable files List Grid */}
+              <div className="space-y-6 pt-4">
+                <h3 className="text-lg font-light text-white flex items-center gap-3 border-b border-border pb-4">
+                  <Download className="w-5 h-5 text-muted" />
+                  <span>作業檔案下載</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    {
+                      name: "台南至阿里山春季攀登企劃",
+                      type: "PDF 文件",
+                      url: "./Tainan_to_Alishan_Spring_Ascent.pdf",
+                      tag: "登山企劃簡報"
+                    },
+                    {
+                      name: "連假每日行程與餐點規劃",
+                      type: "PDF 文件",
+                      url: "./連假每日行程與餐點規劃.pdf",
+                      tag: "行程預算簡報"
+                    },
+                    {
+                      name: "完整清明連假規劃書",
+                      type: "DOCX 企劃書",
+                      url: "./irs_1773019608d5cf3d7146c6a8c1dcf0268b3782c0cd80f7bc70.docx",
+                      tag: "Word 完整報告"
+                    }
+                  ].map((file, i) => (
+                    <motion.div 
+                      key={file.url}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="border border-border rounded-2xl p-5 bg-[#0d0d0d] hover:border-white/20 transition-all flex flex-col justify-between group"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] uppercase font-mono tracking-widest text-white/40 border border-white/10 px-2 py-0.5 rounded">
+                            {file.type}
+                          </span>
+                          <span className="text-[10px] uppercase font-mono text-muted">{file.tag}</span>
+                        </div>
+                        <h4 className="text-white text-sm font-medium leading-normal group-hover:text-white/80 transition-colors">
+                          {file.name}
+                        </h4>
+                      </div>
+                      <a 
+                        href={file.url} 
+                        download
+                        className="mt-6 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-xl py-2.5 text-xs hover:bg-white hover:text-black transition-all font-mono"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        下載檔案
+                      </a>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             </div>
