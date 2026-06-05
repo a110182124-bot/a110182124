@@ -1,9 +1,10 @@
 import React from "react";
 import { motion } from "motion/react";
-import { 
-  Github, 
-  Linkedin, 
-  Mail, 
+import { PdfPresentationViewer, PdfFullDocViewer } from "./components/PdfViewers";
+import {
+  Github,
+  Linkedin,
+  Mail,
   ExternalLink, 
   Code, 
   Briefcase, 
@@ -125,8 +126,8 @@ export default function App() {
   const [activeTab, setActiveTab] = React.useState<"home" | "upload">("home");
   const [files, setFiles] = React.useState<{ name: string; size: string; date: string }[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [activeVideo, setActiveVideo] = React.useState<"youtube" | "local">("youtube");
-  const [activePdf, setActivePdf] = React.useState<"ascent" | "meals">("ascent");
+  const [activeVideo, setActiveVideo] = React.useState<"youtube" | "hailuo" | "local">("youtube");
+  const [activePdf, setActivePdf] = React.useState<"manus" | "gamma" | "notebook" | "meals">("manus");
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
     e.preventDefault();
@@ -206,7 +207,7 @@ export default function App() {
             >
               <div className="absolute -inset-1 bg-gradient-to-tr from-white/20 to-transparent rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
               <img 
-                src="template_preview.png" 
+                src={`${import.meta.env.BASE_URL}template_preview.png`} 
                 alt="吳鎮瑜" 
                 className="w-32 h-32 md:w-48 md:h-48 rounded-full border border-border object-cover relative"
                 referrerPolicy="no-referrer"
@@ -440,18 +441,24 @@ export default function App() {
                     <Film className="w-5 h-5 text-muted" />
                     <span>AI 成果影片區</span>
                   </h3>
-                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0">
+                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0 overflow-x-auto max-w-full">
                     <button 
                       onClick={() => setActiveVideo("youtube")}
-                      className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${activeVideo === "youtube" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "youtube" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
                     >
-                      官方 YouTube
+                      連假規劃 (YouTube)
+                    </button>
+                    <button 
+                      onClick={() => setActiveVideo("hailuo")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "hailuo" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                    >
+                      掃墓爬山 (AI 生成)
                     </button>
                     <button 
                       onClick={() => setActiveVideo("local")}
-                      className={`px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${activeVideo === "local" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "local" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
                     >
-                      航海模擬 (本地)
+                      航海模擬 (本機)
                     </button>
                   </div>
                 </div>
@@ -462,7 +469,7 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   className="relative group rounded-3xl overflow-hidden border border-border bg-black aspect-video flex items-center justify-center shadow-2xl"
                 >
-                  {activeVideo === "youtube" ? (
+                  {activeVideo === "youtube" && (
                     <iframe 
                       src="https://www.youtube.com/embed/93ViSf3tazQ"
                       title="AI 連假作業成果影片"
@@ -470,7 +477,8 @@ export default function App() {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
-                  ) : (
+                  )}
+                  {activeVideo === "hailuo" && (
                     <video 
                       controls 
                       autoPlay
@@ -478,38 +486,71 @@ export default function App() {
                       loop
                       className="w-full h-full object-cover"
                     >
-                      <source src="ai_video.mp4" type="video/mp4" />
+                      <source src={`${import.meta.env.BASE_URL}Hailuo_Video_掃墓祭祖日掃墓完去爬山_505785777208287235.mp4`} type="video/mp4" />
+                      您的瀏覽器不支援影片播放。
+                    </video>
+                  )}
+                  {activeVideo === "local" && (
+                    <video 
+                      controls 
+                      autoPlay
+                      muted
+                      loop
+                      className="w-full h-full object-cover"
+                    >
+                      <source src={`${import.meta.env.BASE_URL}ai_video.mp4`} type="video/mp4" />
                       您的瀏覽器不支援影片播放。
                     </video>
                   )}
                 </motion.div>
-                <p className="text-xs text-muted text-center italic">
-                  * 提示：可以使用上方選單切換播放 YouTube 實拍作品或本機航海模擬影像
-                </p>
+                <div className="text-xs text-muted text-center space-y-1">
+                  <p className="italic">
+                    {activeVideo === "youtube" && "* 提示：此為清明連假完整 AI 規劃說明教學 YouTube 實拍影片。"}
+                    {activeVideo === "hailuo" && "* 提示：此為 Hailuo AI 一鍵生成『掃墓祭祖日，掃墓完去爬山』主題之精緻寫實畫面。"}
+                    {activeVideo === "local" && "* 提示：此為本機航海操船動態模擬實景，用於海事操船成果展示。"}
+                  </p>
+                </div>
               </div>
 
               {/* 3D Toy model Section */}
               <div className="space-y-6">
                 <h3 className="text-xl font-light text-white flex items-center gap-3 border-b border-border pb-4">
                   <Play className="w-5 h-5 text-muted" />
-                  <span>3D 公仔展示</span>
+                  <span>3D 公仔展示 (Tripo3D)</span>
                 </h3>
                 
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-6 rounded-2xl border border-border bg-white/5 break-all"
-                >
-                  <p className="text-sm text-muted mb-2 font-light">外部 3D 模型實境網址：</p>
-                  <a 
-                    href="https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-white hover:text-blue-400 transition-colors underline decoration-border underline-offset-4 font-mono text-sm"
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="md:col-span-2 p-6 rounded-2xl border border-border bg-white/5 flex flex-col justify-between"
                   >
-                    https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0
-                  </a>
-                </motion.div>
+                    <div>
+                      <p className="text-sm font-medium text-white mb-2">3D 生成實境平台 (Tripo3D)</p>
+                      <p className="text-xs text-muted leading-relaxed font-light mb-4">
+                        此為採用 Tripo3D AI 所生成的海洋巡航特色公仔模型。提供全景 360 度任意旋轉、縮放與光影效果。您可以點擊下方連結跳轉至官方工作坊進行全螢幕沈浸式渲染互動。
+                      </p>
+                    </div>
+                    <a 
+                      href="https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-white hover:text-blue-400 transition-colors underline decoration-border underline-offset-4 font-mono text-xs truncate"
+                    >
+                      前往互動模型工作坊 →
+                    </a>
+                  </motion.div>
+
+                  <div className="rounded-2xl border border-border bg-[#0d0d0d] flex items-center justify-center p-6 text-center">
+                    <div>
+                      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-3 text-white">
+                        <Anchor className="w-6 h-6 animate-pulse" />
+                      </div>
+                      <span className="text-xs font-mono text-muted uppercase block">航海公仔</span>
+                      <span className="text-xs text-white/50 block mt-1">互動模型網頁已發佈</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Presentation Slide deck Section */}
@@ -519,102 +560,172 @@ export default function App() {
                     <BookOpen className="w-5 h-5 text-muted" />
                     <span>作業簡報區 (AI 企劃與行程)</span>
                   </h3>
-                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0">
+                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0 overflow-x-auto max-w-full">
                     <button 
-                      onClick={() => setActivePdf("ascent")}
-                      className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${activePdf === "ascent" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      onClick={() => setActivePdf("manus")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "manus" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
                     >
-                      春季登山企劃
+                      Manus AI 企劃
+                    </button>
+                    <button 
+                      onClick={() => setActivePdf("gamma")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "gamma" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                    >
+                      Gamma AI 簡報
+                    </button>
+                    <button 
+                      onClick={() => setActivePdf("notebook")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "notebook" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                    >
+                      NotebookLM 脈絡
                     </button>
                     <button 
                       onClick={() => setActivePdf("meals")}
-                      className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${activePdf === "meals" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "meals" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
                     >
-                      連假行程規劃
+                      每日行程規劃
                     </button>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <motion.div 
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="w-full aspect-[4/3] md:aspect-[16/10] rounded-3xl overflow-hidden border border-border bg-black/60 shadow-xl"
-                  >
-                    {activePdf === "ascent" ? (
-                      <iframe 
-                        src="./Tainan_to_Alishan_Spring_Ascent.pdf" 
-                        className="w-full h-full border-0 select-none bg-zinc-950"
-                        title="Tainan to Alishan Spring Ascent PDF View"
-                      />
-                    ) : (
-                      <iframe 
-                        src="./連假每日行程與餐點規劃.pdf" 
-                        className="w-full h-full border-0 select-none bg-zinc-950"
-                        title="Holiday Planning & Meals PDF View"
-                      />
-                    )}
-                  </motion.div>
-
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                    <h4 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-muted" />
-                      {activePdf === "ascent" ? "台南至阿里山春季攀登企劃" : "連假每日行程與餐點規劃"}
-                    </h4>
-                    <p className="text-sm text-muted leading-relaxed font-light">
-                      {activePdf === "ascent" 
-                        ? "本企劃詳細記錄了台南至阿里山的春季越野遠航與攀登企劃。藉由清明連假，規劃自海平面一路爬升至高山雲海的探索。完整文件包含地形氣象分析、小組安全防護與通訊計畫。"
-                        : "本行程表完整規劃了清明連假的每日活動軌跡與三餐預算。深入探究南台灣台南與嘉義的人文古蹟及特色美食，並進行均衡的預算分配。"}
-                    </p>
-                    <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
-                      <span className="text-xs text-muted font-mono uppercase">已發佈於 public 目錄</span>
-                      <a 
-                        href={activePdf === "ascent" ? "./Tainan_to_Alishan_Spring_Ascent.pdf" : "./連假每日行程與餐點規劃.pdf"} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="text-white text-xs hover:underline flex items-center gap-1 font-mono"
+                {activePdf !== "meals" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                    <div className="md:col-span-2 space-y-4">
+                      <motion.div 
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-border bg-black/60 shadow-xl"
                       >
-                        在新分頁開啟完整 PDF <ExternalLink className="w-3 h-3" />
-                      </a>
+                        {activePdf === "manus" && (
+                          <PdfPresentationViewer url={`${import.meta.env.BASE_URL}manus連假簡報.pdf`} />
+                        )}
+                        {activePdf === "gamma" && (
+                          <PdfPresentationViewer url={`${import.meta.env.BASE_URL}gamma連假簡報.pdf`} />
+                        )}
+                        {activePdf === "notebook" && (
+                          <PdfPresentationViewer url={`${import.meta.env.BASE_URL}notebookLM連假簡報.pdf`} />
+                        )}
+                      </motion.div>
+                    </div>
+
+                    <div className="flex flex-col justify-between border border-border bg-[#0d0d0d] rounded-2xl p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono bg-white/10 text-white/80 px-2 py-0.5 rounded tracking-wider uppercase border border-white/5">
+                            {activePdf === "manus" && "Manus AI 生成"}
+                            {activePdf === "gamma" && "Gamma AI 視覺"}
+                            {activePdf === "notebook" && "NotebookLM 分析"}
+                          </span>
+                        </div>
+                        <h4 className="text-white text-base font-semibold">
+                          {activePdf === "manus" && "Manus AI 智慧連假規劃"}
+                          {activePdf === "gamma" && "Gamma 視覺藝術連假簡報"}
+                          {activePdf === "notebook" && "NotebookLM 資訊脈絡簡報"}
+                        </h4>
+                        <p className="text-xs text-muted leading-relaxed font-light">
+                          {activePdf === "manus" && "本份簡報由先進 Manus AI 自主規劃生成，深度排比南台灣之海陸名勝。運用結構化表格排理每日行程，體現高效率與高精確度之 AI 行程美學。"}
+                          {activePdf === "gamma" && "使用 Gamma 視覺生成平台設計，風格簡約現代、色調和諧。聚焦於嘉義景點、阿里山之行與阿里山森鐵的人文魅力，是令人心曠神怡的視覺名片。"}
+                          {activePdf === "notebook" && "運用 Google NotebookLM 深度理解多源行程材料，提煉出行程的精簡核心與最優決策路線。具有極高的專業報告結構與閱讀舒適感。"}
+                        </p>
+                      </div>
+
+                      <div className="pt-6 border-t border-white/5 mt-6 space-y-3">
+                        <a 
+                          href={
+                            activePdf === "manus" ? `${import.meta.env.BASE_URL}manus連假簡報.pdf` :
+                            activePdf === "gamma" ? `${import.meta.env.BASE_URL}gamma連假簡報.pdf` :
+                            `${import.meta.env.BASE_URL}notebookLM連假簡報.pdf`
+                          } 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="w-full justify-center flex items-center gap-1 bg-white/5 text-white py-2 rounded-xl text-xs hover:bg-white/10 hover:text-white border border-white/10 transition-colors font-mono"
+                        >
+                          下載簡報檔案 <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="w-full rounded-2xl overflow-hidden border border-border bg-[#0d0d0d] shadow-xl"
+                  >
+                    <div className="p-6 border-b border-border text-center">
+                      <span className="text-[10px] font-mono bg-white/10 text-white/80 px-2 py-0.5 rounded tracking-wider uppercase border border-white/5 mb-3 inline-block">
+                        作者精細撰寫
+                      </span>
+                      <h4 className="text-white text-xl font-medium mb-2">
+                        旅程每日精細預算調度
+                      </h4>
+                      <p className="text-sm text-muted leading-relaxed font-light max-w-2xl mx-auto">
+                        由作者親手研發之四天三夜每日實地行程與極限三餐分攤表。全盤涵蓋高速、森鐵與地方歷史老店，整合實用、便利與高性價比的三重維度。
+                      </p>
+                    </div>
+                    <PdfFullDocViewer url={`${import.meta.env.BASE_URL}連假每日行程與餐點規劃.pdf`} />
+                  </motion.div>
+                )}
               </div>
 
               {/* Downloadable files List Grid */}
               <div className="space-y-6 pt-4">
                 <h3 className="text-lg font-light text-white flex items-center gap-3 border-b border-border pb-4">
                   <Download className="w-5 h-5 text-muted" />
-                  <span>作業檔案下載</span>
+                  <span>多格式作業檔案下載專區 (簡報與企劃書)</span>
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
                     {
-                      name: "台南至阿里山春季攀登企劃",
-                      type: "PDF 文件",
-                      url: "./Tainan_to_Alishan_Spring_Ascent.pdf",
-                      tag: "登山企劃簡報"
+                      name: "Manus AI 智慧連假簡報",
+                      type: "PDF 簡報",
+                      url: `${import.meta.env.BASE_URL}manus連假簡報.pdf`,
+                      tag: "AI 智慧規劃"
                     },
                     {
-                      name: "連假每日行程與餐點規劃",
-                      type: "PDF 文件",
-                      url: "./連假每日行程與餐點規劃.pdf",
-                      tag: "行程預算簡報"
+                      name: "Gamma AI 視覺美化簡報",
+                      type: "PDF 簡報",
+                      url: `${import.meta.env.BASE_URL}gamma連假簡報.pdf`,
+                      tag: "AI 視覺精排"
                     },
                     {
-                      name: "完整清明連假規劃書",
+                      name: "NotebookLM 旅遊分析簡報",
+                      type: "PDF 簡報",
+                      url: `${import.meta.env.BASE_URL}notebookLM連假簡報.pdf`,
+                      tag: "AI 脈絡統整"
+                    },
+                    {
+                      name: "連假每日行程餐點手寫規劃",
+                      type: "PDF 行程表",
+                      url: `${import.meta.env.BASE_URL}連假每日行程與餐點規劃.pdf`,
+                      tag: "原創新穎企劃"
+                    },
+                    {
+                      name: "完整清明連假計劃書",
                       type: "DOCX 企劃書",
-                      url: "./irs_1773019608d5cf3d7146c6a8c1dcf0268b3782c0cd80f7bc70.docx",
-                      tag: "Word 完整報告"
+                      url: `${import.meta.env.BASE_URL}連假計劃書.docx`,
+                      tag: "詳細文字報告"
+                    },
+                    {
+                      name: "嘉義台南四天三夜旅遊企劃",
+                      type: "XLSX 試算表",
+                      url: `${import.meta.env.BASE_URL}嘉義台南四天三夜旅遊企劃.xlsx`,
+                      tag: "多維預算矩陣"
+                    },
+                    {
+                      name: "航海工程記錄專利 IRS 文件",
+                      type: "DOCX 文件",
+                      url: `${import.meta.env.BASE_URL}irs_1773019608d5cf3d7146c6a8c1dcf0268b3782c0cd80f7bc70.docx`,
+                      tag: "海事學術文獻"
                     }
                   ].map((file, i) => (
                     <motion.div 
                       key={file.url}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1 }}
+                      transition={{ delay: i * 0.05 }}
                       className="border border-border rounded-2xl p-5 bg-[#0d0d0d] hover:border-white/20 transition-all flex flex-col justify-between group"
                     >
                       <div className="space-y-2">
@@ -631,9 +742,9 @@ export default function App() {
                       <a 
                         href={file.url} 
                         download
-                        className="mt-6 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-xl py-2.5 text-xs hover:bg-white hover:text-black transition-all font-mono"
+                        className="mt-6 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-xl py-2 hover:bg-white hover:text-black transition-all font-mono text-xs"
                       >
-                        <Download className="w-3.5 h-3.5" />
+                        <Download className="w-3 h-3" />
                         下載檔案
                       </a>
                     </motion.div>
