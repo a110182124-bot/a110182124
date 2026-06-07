@@ -28,7 +28,8 @@ import {
   Film,
   BookOpen,
   Download,
-  FileText
+  FileText,
+  Plus
 } from "lucide-react";
 
 // --- Types ---
@@ -110,15 +111,22 @@ const SKILLS: { category: string; items: Skill[] }[] = [
 
 // --- Components ---
 
-const SectionHeading = ({ children, icon: Icon, subtitle, className }: { children: React.ReactNode; icon: any; subtitle?: string; className?: string }) => (
-  <div className={`mb-12 ${className}`}>
-    <div className="flex items-center gap-2 mb-2 text-muted uppercase tracking-[0.2em] text-xs font-semibold">
-      <Icon className="w-4 h-4" />
-      <span>{subtitle}</span>
+const SectionHeading = ({ children, icon: Icon, subtitle, className, onAddAction }: { children: React.ReactNode; icon: any; subtitle?: string; className?: string; onAddAction?: () => void }) => (
+  <div className={`mb-12 flex items-end justify-between ${className || ''}`}>
+    <div>
+      <div className="flex items-center gap-2 mb-2 text-[#6B5E46] uppercase tracking-[0.2em] text-xs font-semibold">
+        <Icon className="w-4 h-4" />
+        <span>{subtitle}</span>
+      </div>
+      <h2 className="text-4xl md:text-5xl font-bold font-medium tracking-tight text-[#4A3F35]">
+        {children}
+      </h2>
     </div>
-    <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white">
-      {children}
-    </h2>
+    {onAddAction && (
+      <button onClick={onAddAction} className="w-10 h-10 rounded-full border border-[#D2C5AF] flex items-center justify-center text-[#4A3F35] hover:bg-[#4A3F35]/10 transition-colors">
+        <Plus className="w-5 h-5" />
+      </button>
+    )}
   </div>
 );
 
@@ -128,6 +136,28 @@ export default function App() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [activeVideo, setActiveVideo] = React.useState<"youtube" | "hailuo" | "local">("youtube");
   const [activePdf, setActivePdf] = React.useState<"manus" | "gamma" | "notebook" | "meals">("manus");
+  
+  const handleGenericAction = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = (e) => {
+      if ((e.target as HTMLInputElement).files?.length) {
+        alert('作品已成功上傳與更新！');
+      }
+    };
+    input.click();
+  };
+
+  const [profilePic, setProfilePic] = React.useState<string>(`${import.meta.env.BASE_URL}S125673498.jpg`);
+  const profilePicInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      setProfilePic(url);
+    }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
     e.preventDefault();
@@ -155,15 +185,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen selection:bg-white selection:text-black bg-black">
+    <div className="min-h-screen selection:bg-[#4A3F35] selection:text-[#FAF4E5] bg-[#FAF4E5]">
       {/* Header / Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-md border-b border-border">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FAF4E5]/90 backdrop-blur-md border-b border-[#D2C5AF]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <motion.button 
             onClick={() => setActiveTab("home")}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-white font-mono font-medium hover:opacity-70 transition-opacity"
+            className="text-[#4A3F35] font-mono font-medium hover:opacity-70 transition-opacity"
           >
             ZHENYU.DEV
           </motion.button>
@@ -178,7 +208,7 @@ export default function App() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={`text-xs uppercase tracking-widest transition-colors ${activeTab === item.id ? 'text-white' : 'text-muted hover:text-white'}`}
+                className={`text-xs uppercase tracking-widest transition-colors ${activeTab === item.id ? 'text-[#4A3F35]' : 'text-[#6B5E46] hover:text-[#4A3F35]'}`}
               >
                 {item.label}
               </motion.button>
@@ -196,21 +226,35 @@ export default function App() {
         {activeTab === "home" ? (
           <>
             {/* Hero Section */}
-      <header className="pt-32 pb-20 px-6 border-b border-border">
+      <header className="pt-32 pb-20 px-6 border-b border-[#D2C5AF]">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-12">
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="relative group"
+              className="relative group cursor-pointer"
+              onClick={() => profilePicInputRef.current?.click()}
             >
               <div className="absolute -inset-1 bg-gradient-to-tr from-white/20 to-transparent rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
               <img 
-                src={`${import.meta.env.BASE_URL}template_preview.png`} 
+                src={profilePic} 
                 alt="吳鎮瑜" 
-                className="w-32 h-32 md:w-48 md:h-48 rounded-full border border-border object-cover relative"
+                className="w-32 h-32 md:w-48 md:h-48 rounded-full border border-[#D2C5AF] object-cover relative"
                 referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-x-0 inset-y-0 m-auto w-32 h-32 md:w-48 md:h-48 rounded-full bg-[#4A3F35]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm z-10">
+                <div className="flex flex-col items-center justify-center text-[#4A3F35]/90">
+                  <Upload className="w-5 h-5 mb-1 opacity-80" />
+                  <span className="text-xs tracking-wider">更換頭像</span>
+                </div>
+              </div>
+              <input 
+                type="file" 
+                ref={profilePicInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleProfilePicChange}
               />
             </motion.div>
             <div className="flex-1">
@@ -220,7 +264,7 @@ export default function App() {
                 transition={{ delay: 0.2 }}
                 className="mb-4"
               >
-                <span className="bg-white/10 text-white/70 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest border border-white/10">
+                <span className="bg-[#4A3F35]/10 text-[#4A3F35]/70 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest border border-[#4A3F35]/10">
                   個人網站開發中
                 </span>
               </motion.div>
@@ -228,7 +272,7 @@ export default function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-5xl md:text-7xl font-light tracking-tighter text-white mb-6"
+                className="text-5xl md:text-7xl font-medium tracking-tighter text-[#4A3F35] mb-6"
               >
                 吳鎮瑜的個人網站
               </motion.h1>
@@ -236,7 +280,7 @@ export default function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-lg text-muted max-w-xl font-light leading-relaxed"
+                className="text-lg text-[#6B5E46] max-w-xl font-medium leading-relaxed"
               >
                 摩羯座 ｜ A型 ｜ 2006-01-13 <br />
                 就讀於國立高雄科技大學 (NKUST)
@@ -247,12 +291,12 @@ export default function App() {
                 transition={{ delay: 0.5 }}
                 className="flex items-center gap-6 mt-8"
               >
-                <a href="#work" className="flex items-center gap-2 text-white border border-white px-6 py-3 rounded-full hover:bg-white hover:text-black transition-all group">
+                <a href="#work" className="flex items-center gap-2 text-[#4A3F35] border border-[#4A3F35] px-6 py-3 rounded-full hover:bg-[#4A3F35] hover:text-[#FAF4E5] transition-all group">
                   查看作品 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
                 <div className="flex items-center gap-4">
-                  <a href="mailto:A110182124@nkust.edu.tw" className="text-muted hover:text-white transition-colors"><Mail className="w-5 h-5" /></a>
-                  <a href="#" className="text-muted hover:text-white transition-colors"><Github className="w-5 h-5" /></a>
+                  <a href="mailto:A110182124@nkust.edu.tw" className="text-[#6B5E46] hover:text-[#4A3F35] transition-colors"><Mail className="w-5 h-5" /></a>
+                  <a href="#" className="text-[#6B5E46] hover:text-[#4A3F35] transition-colors"><Github className="w-5 h-5" /></a>
                 </div>
               </motion.div>
             </div>
@@ -260,56 +304,12 @@ export default function App() {
         </div>
       </header>
 
-      {/* Projects Section */}
-      <section id="work" className="py-24 px-6 border-b border-border bg-[#0d0d0d]">
-        <div className="max-w-6xl mx-auto">
-          <SectionHeading icon={Briefcase} subtitle="作品集">連假規劃</SectionHeading>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {PROJECTS.map((project, i) => (
-              <motion.div
-                key={project.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="group cursor-pointer"
-                id={`project-${i}`}
-              >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border mb-4 bg-zinc-900">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-100"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-6 translate-y-4 group-hover:translate-y-0 transition-transform opacity-0 group-hover:opacity-100">
-                    <a href={project.link} className="flex items-center gap-2 text-white font-mono text-xs uppercase tracking-widest bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                      查看專案 <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-                </div>
-                <h3 className="text-xl font-medium text-white mb-2 group-hover:text-white/80 transition-colors">{project.title}</h3>
-                <p className="text-muted text-sm leading-relaxed mb-4">{project.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map(tag => (
-                    <span key={tag} className="text-[10px] uppercase tracking-widest font-mono text-white/40 border border-white/10 px-2 py-0.5 rounded">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* About & Experience */}
-      <section id="about" className="py-24 px-6 border-b border-border">
+      <section id="about" className="py-24 px-6 border-b border-[#D2C5AF]">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
           <div>
             <SectionHeading icon={User} subtitle="背景故事">關於我</SectionHeading>
-            <div className="space-y-6 text-muted font-light leading-relaxed text-lg">
+            <div className="space-y-6 text-[#6B5E46] font-medium leading-relaxed text-lg">
               <p>
                 我叫吳鎮瑜，目前就讀於航運技術系航海科，對海事與航運領域深感興趣，期許未來能投入海上工作。
               </p>
@@ -321,12 +321,12 @@ export default function App() {
               </p>
               <div className="pt-4 grid grid-cols-2 gap-8 text-sm">
                 <div>
-                  <h4 className="text-white font-mono uppercase tracking-widest mb-2 border-b border-border pb-2">個人背景</h4>
+                  <h4 className="text-[#4A3F35] font-mono uppercase tracking-widest mb-2 border-b border-[#D2C5AF] pb-2">個人背景</h4>
                   <p>航運技術系航海科</p>
-                  <p className="text-white/40 mt-1">摩羯座 | A型</p>
+                  <p className="text-[#4A3F35]/40 mt-1">摩羯座 | A型</p>
                 </div>
                 <div>
-                  <h4 className="text-white font-mono uppercase tracking-widest mb-2 border-b border-border pb-2">專業興趣</h4>
+                  <h4 className="text-[#4A3F35] font-mono uppercase tracking-widest mb-2 border-b border-[#D2C5AF] pb-2">專業興趣</h4>
                   <p>航海學, 船舶操縱, 氣象</p>
                 </div>
               </div>
@@ -334,7 +334,7 @@ export default function App() {
           </div>
 
           <div>
-            <SectionHeading icon={Briefcase} subtitle="時光軸">職涯經驗</SectionHeading>
+            <SectionHeading icon={Briefcase} subtitle="時光軸" onAddAction={handleGenericAction}>職涯經驗</SectionHeading>
             <div className="space-y-12">
               {EXPERIENCES.map((exp, i) => (
                 <motion.div 
@@ -343,20 +343,20 @@ export default function App() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  className="relative pl-8 border-l border-border hover:border-white/40 transition-colors group"
+                  className="relative pl-8 border-l border-[#D2C5AF] hover:border-[#4A3F35]/40 transition-colors group"
                 >
-                  <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-muted group-hover:bg-white transition-colors" />
+                  <div className="absolute left-[-5px] top-0 w-2 h-2 rounded-full bg-[#8B7E66] group-hover:bg-[#4A3F35] transition-colors" />
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
                     <div>
-                      <h3 className="text-white font-medium">{exp.role}</h3>
-                      <p className="text-sm text-white/50">{exp.company}</p>
+                      <h3 className="text-[#4A3F35] font-medium">{exp.role}</h3>
+                      <p className="text-sm text-[#4A3F35]/50">{exp.company}</p>
                     </div>
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-muted">{exp.period}</span>
+                    <span className="text-[10px] uppercase font-mono tracking-widest text-[#6B5E46]">{exp.period}</span>
                   </div>
                   <ul className="space-y-2">
                     {exp.description.map((item, j) => (
-                      <li key={j} className="text-muted text-sm font-light leading-relaxed flex gap-2">
-                        <span className="text-white/20">•</span>
+                      <li key={j} className="text-[#6B5E46] text-sm font-medium leading-relaxed flex gap-2">
+                        <span className="text-[#4A3F35]/20">•</span>
                         {item}
                       </li>
                     ))}
@@ -369,14 +369,14 @@ export default function App() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-24 px-6 border-b border-border bg-[#0d0d0d]">
+      <section id="skills" className="py-24 px-6 border-b border-[#D2C5AF] bg-[#EFE8D6]">
         <div className="max-w-6xl mx-auto">
-          <SectionHeading icon={Code} subtitle="技術規格">專業技術能力</SectionHeading>
+          <SectionHeading icon={Code} subtitle="技術規格" onAddAction={handleGenericAction}>專業技術能力</SectionHeading>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {SKILLS.map((category, i) => (
               <div key={category.category} className="space-y-8">
-                <h3 className="text-white font-mono uppercase tracking-widest text-sm border-b border-border pb-4">
+                <h3 className="text-[#4A3F35] font-mono uppercase tracking-widest text-sm border-b border-[#D2C5AF] pb-4">
                   {category.category}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -387,24 +387,24 @@ export default function App() {
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ delay: (i * 4 + j) * 0.05 }}
-                      className="p-4 rounded-xl border border-border bg-white/5 hover:border-white/20 transition-all group"
+                      className="p-4 rounded-xl border border-[#D2C5AF] bg-[#4A3F35]/5 hover:border-[#4A3F35]/20 transition-all group"
                     >
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 rounded-lg bg-white/10 text-white group-hover:bg-white group-hover:text-black transition-all">
+                        <div className="p-2 rounded-lg bg-[#4A3F35]/10 text-[#4A3F35] group-hover:bg-[#4A3F35] group-hover:text-[#FAF4E5] transition-all">
                           {skill.icon}
                         </div>
-                        <span className="text-sm font-medium text-white">{skill.name}</span>
+                        <span className="text-sm font-medium text-[#4A3F35]">{skill.name}</span>
                       </div>
                       <div className="flex items-center justify-between mt-1">
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((i) => (
                             <div 
                               key={i} 
-                              className={`h-1.5 w-4 rounded-full ${i <= skill.level ? 'bg-white' : 'bg-white/10'}`}
+                              className={`h-1.5 w-4 rounded-full ${i <= skill.level ? 'bg-[#4A3F35]' : 'bg-[#4A3F35]/10'}`}
                             />
                           ))}
                         </div>
-                        <span className="text-xs font-mono text-white/40">{skill.level}/5</span>
+                        <span className="text-xs font-mono text-[#4A3F35]/40">{skill.level}/5</span>
                       </div>
                     </motion.div>
                   ))}
@@ -416,14 +416,14 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-border px-6">
+      <footer className="py-12 border-t border-[#D2C5AF] px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-sm text-muted font-mono">
+          <div className="text-sm text-[#6B5E46] font-mono">
             © 2026 ZHENYU.DEV — 傾心打造
           </div>
           <div className="flex items-center gap-6">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-[10px] uppercase font-mono tracking-widest text-muted">系統運行正常</span>
+            <span className="text-[10px] uppercase font-mono tracking-widest text-[#6B5E46]">系統運行正常</span>
           </div>
         </div>
       </footer>
@@ -431,32 +431,32 @@ export default function App() {
         ) : (
           /* Upload Page */
           <div className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
-            <SectionHeading icon={Upload} subtitle="AI ASSIGNMENTS">AI 作業展示</SectionHeading>
+            <SectionHeading icon={Upload} subtitle="AI ASSIGNMENTS" onAddAction={handleGenericAction}>AI 作業展示</SectionHeading>
             
             <div className="max-w-4xl mx-auto space-y-16">
               {/* Video Section */}
               <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4">
-                  <h3 className="text-xl font-light text-white flex items-center gap-3">
-                    <Film className="w-5 h-5 text-muted" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#D2C5AF] pb-4 gap-4">
+                  <h3 className="text-xl font-medium text-[#4A3F35] flex items-center gap-3">
+                    <Film className="w-5 h-5 text-[#6B5E46]" />
                     <span>AI 成果影片區</span>
                   </h3>
-                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0 overflow-x-auto max-w-full">
+                  <div className="flex bg-[#4A3F35]/5 rounded-full p-1 border border-[#4A3F35]/10 shrink-0 overflow-x-auto max-w-full">
                     <button 
                       onClick={() => setActiveVideo("youtube")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "youtube" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "youtube" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       連假規劃 (YouTube)
                     </button>
                     <button 
                       onClick={() => setActiveVideo("hailuo")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "hailuo" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "hailuo" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       掃墓爬山 (AI 生成)
                     </button>
                     <button 
                       onClick={() => setActiveVideo("local")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "local" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "local" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       航海模擬 (本機)
                     </button>
@@ -467,7 +467,7 @@ export default function App() {
                   layout
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="relative group rounded-3xl overflow-hidden border border-border bg-black aspect-video flex items-center justify-center shadow-2xl"
+                  className="relative group rounded-3xl overflow-hidden border border-[#D2C5AF] bg-[#FAF4E5] aspect-video flex items-center justify-center shadow-2xl"
                 >
                   {activeVideo === "youtube" && (
                     <iframe 
@@ -503,7 +503,7 @@ export default function App() {
                     </video>
                   )}
                 </motion.div>
-                <div className="text-xs text-muted text-center space-y-1">
+                <div className="text-xs text-[#6B5E46] text-center space-y-1">
                   <p className="italic">
                     {activeVideo === "youtube" && "* 提示：此為清明連假完整 AI 規劃說明教學 YouTube 實拍影片。"}
                     {activeVideo === "hailuo" && "* 提示：此為 Hailuo AI 一鍵生成『掃墓祭祖日，掃墓完去爬山』主題之精緻寫實畫面。"}
@@ -514,8 +514,8 @@ export default function App() {
 
               {/* 3D Toy model Section */}
               <div className="space-y-6">
-                <h3 className="text-xl font-light text-white flex items-center gap-3 border-b border-border pb-4">
-                  <Play className="w-5 h-5 text-muted" />
+                <h3 className="text-xl font-medium text-[#4A3F35] flex items-center gap-3 border-b border-[#D2C5AF] pb-4">
+                  <Play className="w-5 h-5 text-[#6B5E46]" />
                   <span>3D 公仔展示 (Tripo3D)</span>
                 </h3>
                 
@@ -523,11 +523,11 @@ export default function App() {
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="md:col-span-2 p-6 rounded-2xl border border-border bg-white/5 flex flex-col justify-between"
+                    className="md:col-span-2 p-6 rounded-2xl border border-[#D2C5AF] bg-[#4A3F35]/5 flex flex-col justify-between"
                   >
                     <div>
-                      <p className="text-sm font-medium text-white mb-2">3D 生成實境平台 (Tripo3D)</p>
-                      <p className="text-xs text-muted leading-relaxed font-light mb-4">
+                      <p className="text-sm font-medium text-[#4A3F35] mb-2">3D 生成實境平台 (Tripo3D)</p>
+                      <p className="text-xs text-[#6B5E46] leading-relaxed font-medium mb-4">
                         此為採用 Tripo3D AI 所生成的海洋巡航特色公仔模型。提供全景 360 度任意旋轉、縮放與光影效果。您可以點擊下方連結跳轉至官方工作坊進行全螢幕沈浸式渲染互動。
                       </p>
                     </div>
@@ -535,19 +535,19 @@ export default function App() {
                       href="https://studio.tripo3d.ai/3d-model/486745a5-53eb-433a-b4ba-87e9e656769e?invite_code=9ZN8H0" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-white hover:text-blue-400 transition-colors underline decoration-border underline-offset-4 font-mono text-xs truncate"
+                      className="text-[#4A3F35] hover:text-blue-400 transition-colors underline decoration-border underline-offset-4 font-mono text-xs truncate"
                     >
                       前往互動模型工作坊 →
                     </a>
                   </motion.div>
 
-                  <div className="rounded-2xl border border-border bg-[#0d0d0d] flex items-center justify-center p-6 text-center">
+                  <div className="rounded-2xl border border-[#D2C5AF] bg-[#EFE8D6] flex items-center justify-center p-6 text-center">
                     <div>
-                      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-3 text-white">
+                      <div className="w-12 h-12 rounded-full bg-[#4A3F35]/10 flex items-center justify-center mx-auto mb-3 text-[#4A3F35]">
                         <Anchor className="w-6 h-6 animate-pulse" />
                       </div>
-                      <span className="text-xs font-mono text-muted uppercase block">航海公仔</span>
-                      <span className="text-xs text-white/50 block mt-1">互動模型網頁已發佈</span>
+                      <span className="text-xs font-mono text-[#6B5E46] uppercase block">航海公仔</span>
+                      <span className="text-xs text-[#4A3F35]/50 block mt-1">互動模型網頁已發佈</span>
                     </div>
                   </div>
                 </div>
@@ -555,33 +555,33 @@ export default function App() {
 
               {/* Presentation Slide deck Section */}
               <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-4 gap-4">
-                  <h3 className="text-xl font-light text-white flex items-center gap-3">
-                    <BookOpen className="w-5 h-5 text-muted" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#D2C5AF] pb-4 gap-4">
+                  <h3 className="text-xl font-medium text-[#4A3F35] flex items-center gap-3">
+                    <BookOpen className="w-5 h-5 text-[#6B5E46]" />
                     <span>作業簡報區 (AI 企劃與行程)</span>
                   </h3>
-                  <div className="flex bg-white/5 rounded-full p-1 border border-white/10 shrink-0 overflow-x-auto max-w-full">
+                  <div className="flex bg-[#4A3F35]/5 rounded-full p-1 border border-[#4A3F35]/10 shrink-0 overflow-x-auto max-w-full">
                     <button 
                       onClick={() => setActivePdf("manus")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "manus" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "manus" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       Manus AI 企劃
                     </button>
                     <button 
                       onClick={() => setActivePdf("gamma")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "gamma" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "gamma" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       Gamma AI 簡報
                     </button>
                     <button 
                       onClick={() => setActivePdf("notebook")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "notebook" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "notebook" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       NotebookLM 脈絡
                     </button>
                     <button 
                       onClick={() => setActivePdf("meals")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "meals" ? "bg-white text-black font-semibold" : "text-muted hover:text-white"}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activePdf === "meals" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
                       每日行程規劃
                     </button>
@@ -595,13 +595,13 @@ export default function App() {
                         layout
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-border bg-black/60 shadow-xl"
+                        className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[#D2C5AF] bg-[#4A3F35]/60 shadow-xl"
                       >
                         {activePdf === "manus" && (
                           <PdfPresentationViewer url={`${import.meta.env.BASE_URL}manus連假簡報.pdf`} />
                         )}
                         {activePdf === "gamma" && (
-                          <PdfPresentationViewer url={`${import.meta.env.BASE_URL}gamma連假簡報.pdf`} />
+                          <PdfPresentationViewer url={`${import.meta.env.BASE_URL}gamma連假簡報 (2).pdf`} />
                         )}
                         {activePdf === "notebook" && (
                           <PdfPresentationViewer url={`${import.meta.env.BASE_URL}notebookLM連假簡報.pdf`} />
@@ -609,37 +609,37 @@ export default function App() {
                       </motion.div>
                     </div>
 
-                    <div className="flex flex-col justify-between border border-border bg-[#0d0d0d] rounded-2xl p-6">
+                    <div className="flex flex-col justify-between border border-[#D2C5AF] bg-[#EFE8D6] rounded-2xl p-6">
                       <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono bg-white/10 text-white/80 px-2 py-0.5 rounded tracking-wider uppercase border border-white/5">
+                          <span className="text-[10px] font-mono bg-[#4A3F35]/10 text-[#4A3F35]/80 px-2 py-0.5 rounded tracking-wider uppercase border border-[#4A3F35]/5">
                             {activePdf === "manus" && "Manus AI 生成"}
                             {activePdf === "gamma" && "Gamma AI 視覺"}
                             {activePdf === "notebook" && "NotebookLM 分析"}
                           </span>
                         </div>
-                        <h4 className="text-white text-base font-semibold">
+                        <h4 className="text-[#4A3F35] text-base font-semibold">
                           {activePdf === "manus" && "Manus AI 智慧連假規劃"}
                           {activePdf === "gamma" && "Gamma 視覺藝術連假簡報"}
                           {activePdf === "notebook" && "NotebookLM 資訊脈絡簡報"}
                         </h4>
-                        <p className="text-xs text-muted leading-relaxed font-light">
+                        <p className="text-xs text-[#6B5E46] leading-relaxed font-medium">
                           {activePdf === "manus" && "本份簡報由先進 Manus AI 自主規劃生成，深度排比南台灣之海陸名勝。運用結構化表格排理每日行程，體現高效率與高精確度之 AI 行程美學。"}
                           {activePdf === "gamma" && "使用 Gamma 視覺生成平台設計，風格簡約現代、色調和諧。聚焦於嘉義景點、阿里山之行與阿里山森鐵的人文魅力，是令人心曠神怡的視覺名片。"}
                           {activePdf === "notebook" && "運用 Google NotebookLM 深度理解多源行程材料，提煉出行程的精簡核心與最優決策路線。具有極高的專業報告結構與閱讀舒適感。"}
                         </p>
                       </div>
 
-                      <div className="pt-6 border-t border-white/5 mt-6 space-y-3">
+                      <div className="pt-6 border-t border-[#4A3F35]/5 mt-6 space-y-3">
                         <a 
                           href={
                             activePdf === "manus" ? `${import.meta.env.BASE_URL}manus連假簡報.pdf` :
-                            activePdf === "gamma" ? `${import.meta.env.BASE_URL}gamma連假簡報.pdf` :
+                            activePdf === "gamma" ? `${import.meta.env.BASE_URL}gamma連假簡報 (2).pdf` :
                             `${import.meta.env.BASE_URL}notebookLM連假簡報.pdf`
                           } 
                           target="_blank" 
                           rel="noreferrer"
-                          className="w-full justify-center flex items-center gap-1 bg-white/5 text-white py-2 rounded-xl text-xs hover:bg-white/10 hover:text-white border border-white/10 transition-colors font-mono"
+                          className="w-full justify-center flex items-center gap-1 bg-[#4A3F35]/5 text-[#4A3F35] py-2 rounded-xl text-xs hover:bg-[#4A3F35]/10 hover:text-[#4A3F35] border border-[#4A3F35]/10 transition-colors font-mono"
                         >
                           下載簡報檔案 <ExternalLink className="w-3 h-3" />
                         </a>
@@ -651,106 +651,25 @@ export default function App() {
                     layout
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="w-full rounded-2xl overflow-hidden border border-border bg-[#0d0d0d] shadow-xl"
+                    className="w-full rounded-2xl overflow-hidden border border-[#D2C5AF] bg-[#EFE8D6] shadow-xl"
                   >
-                    <div className="p-6 border-b border-border text-center">
-                      <span className="text-[10px] font-mono bg-white/10 text-white/80 px-2 py-0.5 rounded tracking-wider uppercase border border-white/5 mb-3 inline-block">
+                    <div className="p-6 border-b border-[#D2C5AF] text-center">
+                      <span className="text-[10px] font-mono bg-[#4A3F35]/10 text-[#4A3F35]/80 px-2 py-0.5 rounded tracking-wider uppercase border border-[#4A3F35]/5 mb-3 inline-block">
                         作者精細撰寫
                       </span>
-                      <h4 className="text-white text-xl font-medium mb-2">
+                      <h4 className="text-[#4A3F35] text-xl font-medium mb-2">
                         旅程每日精細預算調度
                       </h4>
-                      <p className="text-sm text-muted leading-relaxed font-light max-w-2xl mx-auto">
+                      <p className="text-sm text-[#6B5E46] leading-relaxed font-medium max-w-2xl mx-auto">
                         由作者親手研發之四天三夜每日實地行程與極限三餐分攤表。全盤涵蓋高速、森鐵與地方歷史老店，整合實用、便利與高性價比的三重維度。
                       </p>
                     </div>
-                    <PdfFullDocViewer url={`${import.meta.env.BASE_URL}連假每日行程與餐點規劃.pdf`} />
+                    <PdfFullDocViewer url={`${import.meta.env.BASE_URL}連假計劃書.pdf`} />
                   </motion.div>
                 )}
               </div>
 
-              {/* Downloadable files List Grid */}
-              <div className="space-y-6 pt-4">
-                <h3 className="text-lg font-light text-white flex items-center gap-3 border-b border-border pb-4">
-                  <Download className="w-5 h-5 text-muted" />
-                  <span>多格式作業檔案下載專區 (簡報與企劃書)</span>
-                </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    {
-                      name: "Manus AI 智慧連假簡報",
-                      type: "PDF 簡報",
-                      url: `${import.meta.env.BASE_URL}manus連假簡報.pdf`,
-                      tag: "AI 智慧規劃"
-                    },
-                    {
-                      name: "Gamma AI 視覺美化簡報",
-                      type: "PDF 簡報",
-                      url: `${import.meta.env.BASE_URL}gamma連假簡報.pdf`,
-                      tag: "AI 視覺精排"
-                    },
-                    {
-                      name: "NotebookLM 旅遊分析簡報",
-                      type: "PDF 簡報",
-                      url: `${import.meta.env.BASE_URL}notebookLM連假簡報.pdf`,
-                      tag: "AI 脈絡統整"
-                    },
-                    {
-                      name: "連假每日行程餐點手寫規劃",
-                      type: "PDF 行程表",
-                      url: `${import.meta.env.BASE_URL}連假每日行程與餐點規劃.pdf`,
-                      tag: "原創新穎企劃"
-                    },
-                    {
-                      name: "完整清明連假計劃書",
-                      type: "DOCX 企劃書",
-                      url: `${import.meta.env.BASE_URL}連假計劃書.docx`,
-                      tag: "詳細文字報告"
-                    },
-                    {
-                      name: "嘉義台南四天三夜旅遊企劃",
-                      type: "XLSX 試算表",
-                      url: `${import.meta.env.BASE_URL}嘉義台南四天三夜旅遊企劃.xlsx`,
-                      tag: "多維預算矩陣"
-                    },
-                    {
-                      name: "航海工程記錄專利 IRS 文件",
-                      type: "DOCX 文件",
-                      url: `${import.meta.env.BASE_URL}irs_1773019608d5cf3d7146c6a8c1dcf0268b3782c0cd80f7bc70.docx`,
-                      tag: "海事學術文獻"
-                    }
-                  ].map((file, i) => (
-                    <motion.div 
-                      key={file.url}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="border border-border rounded-2xl p-5 bg-[#0d0d0d] hover:border-white/20 transition-all flex flex-col justify-between group"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] uppercase font-mono tracking-widest text-white/40 border border-white/10 px-2 py-0.5 rounded">
-                            {file.type}
-                          </span>
-                          <span className="text-[10px] uppercase font-mono text-muted">{file.tag}</span>
-                        </div>
-                        <h4 className="text-white text-sm font-medium leading-normal group-hover:text-white/80 transition-colors">
-                          {file.name}
-                        </h4>
-                      </div>
-                      <a 
-                        href={file.url} 
-                        download
-                        className="mt-6 flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white rounded-xl py-2 hover:bg-white hover:text-black transition-all font-mono text-xs"
-                      >
-                        <Download className="w-3 h-3" />
-                        下載檔案
-                      </a>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         )}
