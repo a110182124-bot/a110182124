@@ -208,7 +208,7 @@ export default function App() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={`text-xs uppercase tracking-widest transition-colors ${activeTab === item.id ? 'text-[#4A3F35]' : 'text-[#6B5E46] hover:text-[#4A3F35]'}`}
+                className={`text-sm uppercase tracking-widest transition-all px-5 py-2.5 rounded-full font-bold ${activeTab === item.id ? 'bg-[#4A3F35] text-[#FAF4E5] shadow-lg scale-105' : 'text-[#6B5E46] hover:bg-[#4A3F35]/10 hover:text-[#4A3F35]'}`}
               >
                 {item.label}
               </motion.button>
@@ -291,12 +291,14 @@ export default function App() {
                 transition={{ delay: 0.5 }}
                 className="flex items-center gap-6 mt-8"
               >
-                <a href="#work" className="flex items-center gap-2 text-[#4A3F35] border border-[#4A3F35] px-6 py-3 rounded-full hover:bg-[#4A3F35] hover:text-[#FAF4E5] transition-all group">
-                  查看作品 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
+                <button onClick={() => {
+                  setActiveTab("upload");
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }} className="flex items-center gap-2 text-[#4A3F35] border-2 border-[#4A3F35] bg-transparent backdrop-blur-sm px-6 py-3 rounded-full hover:bg-[#4A3F35] hover:text-[#FAF4E5] transition-all group font-bold shadow-sm hover:shadow-md">
+                  查看 AI 作業 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
                 <div className="flex items-center gap-4">
-                  <a href="mailto:A110182124@nkust.edu.tw" className="text-[#6B5E46] hover:text-[#4A3F35] transition-colors"><Mail className="w-5 h-5" /></a>
-                  <a href="#" className="text-[#6B5E46] hover:text-[#4A3F35] transition-colors"><Github className="w-5 h-5" /></a>
+                  <a href="mailto:a110182124@nkust.edu.tw" className="text-[#6B5E46] hover:text-[#4A3F35] transition-colors"><Mail className="w-5 h-5" /></a>
                 </div>
               </motion.div>
             </div>
