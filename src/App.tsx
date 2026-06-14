@@ -134,7 +134,7 @@ export default function App() {
   const [activeTab, setActiveTab] = React.useState<"home" | "upload">("home");
   const [files, setFiles] = React.useState<{ name: string; size: string; date: string }[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [activeVideo, setActiveVideo] = React.useState<"youtube" | "hailuo" | "local">("youtube");
+  const [activeVideo, setActiveVideo] = React.useState<"youtube1" | "youtube2">("youtube1");
   const [activePdf, setActivePdf] = React.useState<"manus" | "gamma" | "notebook" | "meals">("manus");
   
   const handleGenericAction = () => {
@@ -445,22 +445,16 @@ export default function App() {
                   </h3>
                   <div className="flex bg-[#4A3F35]/5 rounded-full p-1 border border-[#4A3F35]/10 shrink-0 overflow-x-auto max-w-full">
                     <button 
-                      onClick={() => setActiveVideo("youtube")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "youtube" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
+                      onClick={() => setActiveVideo("youtube1")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "youtube1" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
-                      連假規劃 (YouTube)
+                      ai影片(1)
                     </button>
                     <button 
-                      onClick={() => setActiveVideo("hailuo")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "hailuo" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
+                      onClick={() => setActiveVideo("youtube2")}
+                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "youtube2" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
                     >
-                      掃墓爬山 (AI 生成)
-                    </button>
-                    <button 
-                      onClick={() => setActiveVideo("local")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 shrink-0 ${activeVideo === "local" ? "bg-[#4A3F35] text-[#FAF4E5] font-semibold" : "text-[#6B5E46] hover:text-[#4A3F35]"}`}
-                    >
-                      航海模擬 (本機)
+                      ai影片(2)
                     </button>
                   </div>
                 </div>
@@ -471,45 +465,29 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   className="relative group rounded-3xl overflow-hidden border border-[#D2C5AF] bg-[#FAF4E5] aspect-video flex items-center justify-center shadow-2xl"
                 >
-                  {activeVideo === "youtube" && (
+                  {activeVideo === "youtube1" && (
                     <iframe 
                       src="https://www.youtube.com/embed/93ViSf3tazQ"
-                      title="AI 連假作業成果影片"
+                      title="AI 連假作業成果影片 1"
                       className="w-full h-full border-0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
                   )}
-                  {activeVideo === "hailuo" && (
-                    <video 
-                      controls 
-                      autoPlay
-                      muted
-                      loop
-                      className="w-full h-full object-cover"
-                    >
-                      <source src={`${import.meta.env.BASE_URL}Hailuo_Video_掃墓祭祖日掃墓完去爬山_505785777208287235.mp4`} type="video/mp4" />
-                      您的瀏覽器不支援影片播放。
-                    </video>
-                  )}
-                  {activeVideo === "local" && (
-                    <video 
-                      controls 
-                      autoPlay
-                      muted
-                      loop
-                      className="w-full h-full object-cover"
-                    >
-                      <source src={`${import.meta.env.BASE_URL}ai_video.mp4`} type="video/mp4" />
-                      您的瀏覽器不支援影片播放。
-                    </video>
+                  {activeVideo === "youtube2" && (
+                    <iframe 
+                      src="https://www.youtube.com/embed/O2Y4hCrGMZc"
+                      title="AI 連假作業成果影片 2"
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
                   )}
                 </motion.div>
                 <div className="text-xs text-[#6B5E46] text-center space-y-1">
                   <p className="italic">
-                    {activeVideo === "youtube" && "* 提示：此為清明連假完整 AI 規劃說明教學 YouTube 實拍影片。"}
-                    {activeVideo === "hailuo" && "* 提示：此為 Hailuo AI 一鍵生成『掃墓祭祖日，掃墓完去爬山』主題之精緻寫實畫面。"}
-                    {activeVideo === "local" && "* 提示：此為本機航海操船動態模擬實景，用於海事操船成果展示。"}
+                    {activeVideo === "youtube1" && "* 提示：此為清明連假完整 AI 規劃說明教學 YouTube 實拍影片 1。"}
+                    {activeVideo === "youtube2" && "* 提示：此為清明連假完整 AI 規劃說明教學 YouTube 實拍影片 2。"}
                   </p>
                 </div>
               </div>
